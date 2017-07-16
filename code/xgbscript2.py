@@ -11,21 +11,11 @@ test = pd.read_csv('../input/test.csv')
 
 test.drop(['y'],axis = 1,inplace=True)
 
-fea = ['X0','X5','X118',    'X127',
-            'X47',
-            'X315',
-            'X311',
-            'X179',
-            'X314',
-### added by Tilii
-            'X232',
-            'X29',
-            'X263',
-###
-            'X261']
-
-train = train.loc[:,fea+['y']]
-test = test.loc[:,fea]
+for c in train.columns:
+    if c not in train.columns[:11]:
+        if  ((train[c].sum() < 1)):
+            train.drop(c,axis = 1,inplace = True)
+            test.drop(c,axis = 1,inplace = True) 
 
 # process columns, apply LabelEncoder to categorical features
 for c in train.columns:

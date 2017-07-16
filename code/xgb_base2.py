@@ -26,33 +26,11 @@ test.drop(['y'],axis = 1,inplace=True)
 
 # In[62]:
 
-
-
-
-# In[63]:
-
-train
-
-
-# In[64]:
-
-# train.drop(['X257','X258','X295','X296','X369'],axis = 1,inplace = True)
-# test.drop(['X257','X258','X295','X296','X369'],axis = 1,inplace = True)
-
-
-# In[65]:
-
-train.shape
-
-
-# In[66]:
-
-test.shape
-
-
-# ###### label encoding
-
-# In[67]:
+for c in train.columns:
+    if c not in train.columns[:11]:
+        if  ((train[c].sum() < 1)):
+            train.drop(c,axis = 1,inplace = True)
+            test.drop(c,axis = 1,inplace = True)
 
 # process columns, apply LabelEncoder to categorical features
 for c in train.columns:
@@ -66,19 +44,9 @@ for c in train.columns:
 print('Shape train: {}\nShape test: {}'.format(train.shape, test.shape))
 
 
-# In[68]:
-
-train.shape
-
-
-# ### Add decomposed components: PCA / ICA etc.
-
-# In[69]:
 
 col = [k for k in train.columns if k not in {"y","X0","X1","X2","X3","X4","X5","X6","X8"}]
 
-
-# In[70]:
 
 n_comp = 10
 
@@ -128,20 +96,7 @@ for i in range(1, n_comp+1):
     test['ica_' + str(i)] = ica2_results_test[:, i-1]
 
 
-# In[73]:
 
-# # tSVD
-# tsvd = TruncatedSVD(n_components=n_comp, random_state=420)
-# tsvd_results_train = tsvd.fit_transform(train.drop(["y","X0","X1","X2","X3","X4","X5","X6","X8"], axis=1))
-# tsvd_results_test = tsvd.transform(test.drop(["X0","X1","X2","X3","X4","X5","X6","X8"], axis=1))
-# for i in range(1, n_comp+1):
-#     train['tsvd_' + str(i)] = tsvd_results_train[:,i-1]
-#     test['tsvd_' + str(i)] = tsvd_results_test[:, i-1]
-
-
-# ###### Build Group featrue
-
-# In[74]:
 
 def GRR(train,test,num):
     X2_train = train.groupby('X'+str(num))['y'].mean().reset_index()
@@ -173,34 +128,9 @@ def GRM(train,test,num):
     return train,test
 
 
-# In[76]:
-
-# from sklearn.cluster import MiniBatchKMeans, KMeans
-
-# # #kmeans
-# k_means = KMeans(init='k-means++', n_clusters=25, n_init=10)
-# train['kms'] = k_means.fit_predict(train.drop(["y","X0","X1","X2","X3","X4","X5","X6","X8"], axis=1))
-# test['kms'] = k_means.predict(test.drop(["X0","X1","X2","X3","X4","X5","X6","X8"], axis=1))
-
-
-# In[77]:
-
-# import seaborn as sns
-# df = train[['X0','X1','X2','X3','X4','X5','X6','X8',"y"]]
-# corrmat = df.corr()
-# f, ax = plt.subplots(figsize=(12, 9))
-# sns.heatmap(corrmat, vmax=.8, square=True);
-
-
-# In[78]:
-
 
 train,test = GRR(train,test,0)
-#train,test = GRM(train,test,0)
-#train,test = GRR(train,test,6)
 
-
-# In[79]:
 
 test[test.X0G.isnull()]
 
@@ -211,43 +141,6 @@ test.to_csv('last_test.csv',index=False)
 train.to_csv('last_train.csv',index=False)
 
 
-# ###### add DecisionTree Featrue
-
-# In[81]:
-
-# train['Tree1'] = 0
-# train.loc[(train.X315 < 0.5) & (train.X314 >= 0.5),'Tree1'] = 1
-# train.loc[(train.X315 < 0.5) & (train.X314<0.5) & (train.X47 > 0.5 ),'Tree1'] = 2
-# train.loc[(train.X315 < 0.5) & (train.X314<0.5) & (train.X47 < 0.5 )&(train.X189<0.5),'Tree1'] = 3
-# train.loc[(train.X315 < 0.5) & (train.X314<0.5) & (train.X47 < 0.5 )&(train.X189>=0.5)&(train.X179<0.5),'Tree1'] = 4
-# train.loc[(train.X315 < 0.5) & (train.X314<0.5) & (train.X47 < 0.5 )&(train.X189>=0.5)&(train.X179>=0.5),'Tree1'] = 5
-# train.loc[(train.X315 >= 0.5) & (train.X118 >= 0.5),'Tree1'] = 6
-# train.loc[(train.X315 >= 0.5) & (train.X118 < 0.5)&(train.X201>=0.5),'Tree1'] = 7
-# train.loc[(train.X315 >= 0.5) & (train.X118 < 0.5)&(train.X201<0.5)&(train.X284>=0.5),'Tree1'] = 8
-# train.loc[(train.X315 >= 0.5) & (train.X118 < 0.5)&(train.X201<0.5)&(train.X284<0.5)&(train.X22<0.5),'Tree1'] = 9
-# train.loc[(train.X315 >= 0.5) & (train.X118 < 0.5)&(train.X201<0.5)&(train.X284<0.5)&(train.X22>=0.5),'Tree1'] = 10
-
-
-# In[82]:
-
-# test['Tree1'] = 0
-# test.loc[(test.X315 < 0.5) & (test.X314 >= 0.5),'Tree1'] = 1
-# test.loc[(test.X315 < 0.5) & (test.X314<0.5) & (test.X47 > 0.5 ),'Tree1'] = 2
-# test.loc[(test.X315 < 0.5) & (test.X314<0.5) & (test.X47 < 0.5 )&(test.X189<0.5),'Tree1'] = 3
-# test.loc[(test.X315 < 0.5) & (test.X314<0.5) & (test.X47 < 0.5 )&(test.X189>=0.5)&(test.X179<0.5),'Tree1'] = 4
-# test.loc[(test.X315 < 0.5) & (test.X314<0.5) & (test.X47 < 0.5 )&(test.X189>=0.5)&(test.X179>=0.5),'Tree1'] = 5
-# test.loc[(test.X315 >= 0.5) & (test.X118 >= 0.5),'Tree1'] = 6
-# test.loc[(test.X315 >= 0.5) & (test.X118 < 0.5)&(test.X201>=0.5),'Tree1'] = 7
-# test.loc[(test.X315 >= 0.5) & (test.X118 < 0.5)&(test.X201<0.5)&(test.X284>=0.5),'Tree1'] = 8
-# test.loc[(test.X315 >= 0.5) & (test.X118 < 0.5)&(test.X201<0.5)&(test.X284<0.5)&(test.X22<0.5),'Tree1'] = 9
-# test.loc[(test.X315 >= 0.5) & (test.X118 < 0.5)&(test.X201<0.5)&(test.X284<0.5)&(test.X22>=0.5),'Tree1'] = 10
-
-
-# ### Preparing Regressor
-
-# In[83]:
-
-()# mmm, xgboost, loved by everyone ^-^
 import xgboost as xgb
 
 y_train = train["y"]
