@@ -1,6 +1,6 @@
 # Kaggle-Mercedes-Benz-Greener-Manufacturing-33th-Solution
 https://www.kaggle.com/c/mercedes-benz-greener-manufacturing
-My final submit was an average of five models.
+###My final submit was an average of five models.
 ###model 1,2
 Two of them I've made myself (weights 0.25 and 0.2)
 one model use all feature but some outliers by
